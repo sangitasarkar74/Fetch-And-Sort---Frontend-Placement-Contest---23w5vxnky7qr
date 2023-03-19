@@ -6,31 +6,21 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sortAscending, setSortAscending] = useState(true);
 
-  useEffect(() => {
-    const fetchData = () => {
-      setIsLoading(true);
-      fetch("https://content.newtonschool.co/v1/pr/main/users")
-        .then((res) => res.json())
-        .then((data) =>
-          setUsers(
-            data.map((user) => ({
-              id: user.id,
-              name: user.name,
-              email: user.email,
-            }))
-          )
-        );
-      setIsLoading(false);
-    };
-    fetchData();
-  }, []);
+  const fetchData = () => {
+    setIsLoading(true);
+    fetch("https://content.newtonschool.co/v1/pr/main/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .finally(() => setIsLoading(false));
+  };
+
   const handleSort = () => {
-    setIsAscending(!isAscending);
+    setSortAscending(!sortAscending);
     setUsers(
       users.sort((a, b) => {
         const nameA = a.name.length;
         const nameB = b.name.length;
-        if (isAscending) {
+        if (sortAscending) {
           return nameA - nameB;
         } else {
           return nameB - nameA;
@@ -43,7 +33,7 @@ const App = () => {
     <div id="main">
       <h2>User List</h2>
 
-      <button className="fetch-data-btn" onClick={() => setUsers([])}>
+      <button className="fetch-data-btn" onClick={fetchData}>
         Fetch User Data
       </button>
       <button className="sort-btn" onClick={handleSort}>
@@ -55,7 +45,7 @@ const App = () => {
         <p>Loading...</p>
       ) : (
         <div className="users-section">
-          {users.map((user) => {
+          {users.map((user, index) => {
             return (
               <li key={index}>
                 <section className="id-section">{user.id}</section>
